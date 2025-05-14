@@ -11,6 +11,7 @@ import sys
 
 import ecmwf.jupyter_components
 
+sys.path.insert(0, os.path.abspath("./"))
 sys.path.insert(0, os.path.abspath("../"))
 
 # -- Project information -----------------------------------------------------
@@ -38,7 +39,7 @@ autodoc_typehints = "none"
 
 # autoapi configuration
 autoapi_add_toctree_entry = False
-autoapi_dirs = ["../ecmwf.jupyter_components"]
+autoapi_dirs = ["../src/ecmwf/jupyter_components"]
 autoapi_ignore = ["*/version.py"]
 autoapi_member_order = "groupwise"
 autoapi_options = [
