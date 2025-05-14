@@ -2,7 +2,7 @@
 
 <p align="center">
   <a href="https://github.com/ecmwf/codex/raw/refs/heads/main/ESEE">
-    <img src="https://github.com/ecmwf/codex/raw/refs/heads/main/ESEE/user_interaction.svg" alt="ECMWF Software EnginE">
+    <img src="https://github.com/ecmwf/codex/raw/refs/heads/main/ESEE/user_interaction_badge.svg" alt="ECMWF Software EnginE">
   </a>
   <a href="https://github.com/ecmwf/codex/raw/refs/heads/main/Project Maturity">
     <img src="https://github.com/ecmwf/codex/raw/refs/heads/main/Project Maturity/sandbox_badge.svg" alt="Maturity Level">
