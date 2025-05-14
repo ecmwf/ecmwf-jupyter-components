@@ -83,7 +83,10 @@ def test_static_form_parser_filters() -> None:
             "details": {"labels": {"a": "A", "b": "B"}, "values": ["a", "b"]},
         },
     ]
-    dummy = DssDownloadForm()
+    dummy = DssDownloadForm(
+        url="https://cds.climate.copernicus.eu/api",
+        key="00112233-4455-6677-c899-aabbccddeeff" # Public test key
+    )
     parsed = dummy._form_json_to_widgets_dict(form)
     assert "valid" in parsed
     assert parsed["valid"]["type"] == "radio"

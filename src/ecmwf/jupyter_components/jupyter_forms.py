@@ -76,14 +76,15 @@ class DssDownloadForm(DownloadForm):
         self,
         client: DssClient | None = None,
         output: Optional[widgets.Output] = None,
+        **client_kwargs
     ):
         if client is None:
             try:
-                client = DssClient()
+                client = DssClient(**client_kwargs)
             except FileNotFoundError:
                 # ecwmf.datastores credentials not found, try to use cdsapi
                 try:
-                    client = cdsapi.Client().client
+                    client = cdsapi.Client(**client_kwargs).client
                 except Exception:
                     raise ValueError(
                         "No DSS client provided and no default client found."
