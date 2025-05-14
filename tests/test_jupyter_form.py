@@ -2,7 +2,7 @@ from typing import Any, Dict, List
 from unittest.mock import Mock
 
 import pytest
-from ipywidgets import Output, ToggleButton, VBox  # type: ignore
+from ipywidgets import Output, ToggleButton, VBox
 
 from ecmwf.jupyter_components.jupyter_form import DownloadForm
 

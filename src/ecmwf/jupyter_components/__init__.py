@@ -22,4 +22,10 @@ except ImportError:  # pragma: no cover
     # Local copy or not installed with setuptools
     __version__ = "999"
 
-__all__ = ["__version__"]
+# from ecmwf.jupyter_components import jupyter_forms
+# from . import jupyter_forms
+
+__all__ = [
+    "__version__",
+    # "jupyter_forms",
+]

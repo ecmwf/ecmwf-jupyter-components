@@ -1,7 +1,7 @@
 import json
 from typing import Any, Callable, Dict, List, Optional
 
-import ipywidgets as widgets  # type: ignore
+import ipywidgets as widgets
 from IPython.display import clear_output as _clear_output
 from IPython.display import display as _display
 
@@ -34,7 +34,7 @@ class DownloadForm:
         self.client: Client = client
         self.output: widgets.Output = output or widgets.Output()
         self.collection_id: Optional[str] = None
-        self.request: Dict[str, Any] = {}
+        self.request: Dict[str, str | list[str]] = {}
 
         self.collections: List[str] = sorted(client.get_collections().collection_ids)
         self.collection_widget: widgets.Dropdown = widgets.Dropdown(
@@ -232,7 +232,7 @@ class DownloadForm:
         """Return a pretty-printed JSON string of the request."""
         if request is None:
             request = self.request
-        _request = {}
+        _request: dict[str, str | list[str]] = {}
         for k, v in request.items():
             if isinstance(v, list) and len(v) == 1:
                 _request[k] = v[0]
