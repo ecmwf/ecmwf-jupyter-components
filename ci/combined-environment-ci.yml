@@ -14,4 +14,3 @@ dependencies:
 - pytest-cov
 - sphinx
 - sphinx-autoapi
-

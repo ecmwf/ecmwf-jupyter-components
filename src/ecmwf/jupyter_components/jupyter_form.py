@@ -2,9 +2,10 @@ import json
 from typing import Any, Callable, Dict, List, Optional
 
 import ipywidgets as widgets  # type: ignore
-from ecmwf.datastores import Client
 from IPython.display import clear_output as _clear_output
 from IPython.display import display as _display
+
+from ecmwf.datastores import Client
 
 
 # Override IPython methods with typeset version
@@ -118,7 +119,9 @@ class DownloadForm:
                             widget.value = None
                     elif isinstance(widget, widgets.SelectMultiple):
                         widget.options = values
-                        widget.value = tuple([x for x in self.request[key] if x in values])
+                        widget.value = tuple(
+                            [x for x in self.request[key] if x in values]
+                        )
 
             self._update_selection_state()
             update_selection_display()
@@ -209,9 +212,7 @@ class DownloadForm:
             with self.selection_output:
                 print(f"dataset = {self.collection_id}")
                 print(f"request = {self._pretty_request()}")
-            selection_box = widgets.Accordion(
-                children=[self.selection_output]
-            )
+            selection_box = widgets.Accordion(children=[self.selection_output])
             selection_box.set_title(0, "View current Selection")
             selection_box.selected_index = None
 
