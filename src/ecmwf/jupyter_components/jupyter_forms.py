@@ -6,7 +6,8 @@ import ipywidgets as widgets
 from IPython.display import clear_output as _clear_output
 from IPython.display import display as _display
 
-from ecmwf.datastores import Client
+import cdsapi
+from ecmwf.datastores import Client as DssClient
 
 
 # Override IPython methods with typeset version
@@ -65,21 +66,6 @@ class DownloadForm(AbstractDownloadForm):
         """
         raise NotImplementedError("This method should be implemented by subclasses.")
     
-    # TODO: This may not need to be a class method
-    def _pretty_dict(self, request: dict[str, str | list[str]]) -> str:
-        """Return a pretty-printed JSON string of the request.
-
-        This method should be implemented by subclasses to format the request
-        in a human-readable way.
-        """
-        _request: dict[str, str | list[str]] = {}
-        for k, v in request.items():
-            if isinstance(v, list) and len(v) == 1:
-                _request[k] = v[0]
-            else:
-                _request[k] = v
-        return json.dumps(_request, indent=2)
-
 
 class DssDownloadForm(DownloadForm):
     """Interactive selection form for collections in a Jupyter Notebook using ipywidgets.
@@ -89,13 +75,24 @@ class DssDownloadForm(DownloadForm):
 
     def __init__(
         self,
-        client: Client = Client(
-            url="https://cds.climate.copernicus.eu/api",
-            key="00112233-4455-6677-c899-aabbccddeeff",
-        ),
+        client: DssClient | None = None,
         output: Optional[widgets.Output] = None,
     ):
-        self.client: Client = client
+        if client is None:
+            try:
+                client = DssClient()
+            except FileNotFoundError:
+                # ecwmf.datastores credentials not found, try to use cdsapi
+                try:
+                    client = cdsapi.Client().client
+                except Exception:
+                    raise ValueError(
+                        "No DSS client provided and no default client found."
+                    )
+        if isinstance(client, cdsapi.Client):
+            client = client.client
+                    
+        self.client: DssClient = client
         self.output: widgets.Output = output or widgets.Output()
         self.collection_id: Optional[str] = None
         self.request: Dict[str, str | list[str]] = {}
@@ -151,7 +148,7 @@ class DssDownloadForm(DownloadForm):
             with self.selection_output:
                 self.selection_output.clear_output()
                 print(f"dataset = {self.collection_id}")
-                print(f"request = {self._pretty_dict(self.request)}")
+                print(f"request = {self._pretty_request(self.request)}")
 
         def on_change(change: Dict[str, Any]) -> None:
             for key, widget in self.widget_defs.items():
@@ -275,7 +272,7 @@ class DssDownloadForm(DownloadForm):
             self.output.clear_output()
             with self.selection_output:
                 print(f"dataset = {self.collection_id}")
-                print(f"request = {self._pretty_dict(self.request)}")
+                print(f"request = {self._pretty_request(self.request)}")
             selection_box = widgets.Accordion(children=[self.selection_output])
             selection_box.set_title(0, "View current Selection")
             selection_box.selected_index = None
@@ -354,6 +351,40 @@ class DssDownloadForm(DownloadForm):
             if "default" in details:
                 out_widgets[widget_name]["default"] = details["default"]
         return out_widgets
+
+    def _pretty_request(self, request: dict[str, str | list[str]]) -> str:
+        """Return a pretty-printed JSON string of the request.
+
+        This method should be implemented by subclasses to format the request
+        in a human-readable way.
+        """
+        output: str = "{\n"
+        for k, v in request.items():
+            if isinstance(v, str):
+                output += f'  "{k}": "{v}",\n'
+            elif isinstance(v, list):
+                if len(v) == 1:
+                    output += f'  "{k}": "{v[0]}",\n'
+                elif k not in ["time", "date", "month", "year", "day", "step"]:
+                    # Put each item on a new line
+                    output += f'  "{k}": [\n'
+                    for x in v:
+                        output += f'    "{x}",\n'
+                    output += "  ],\n"
+                elif len(v) <= 4:
+                    # Put on a single line
+                    output += f'  "{k}": ['
+                    output += ", ".join(f'"{x}"' for x in v)
+                    output += "],\n"
+                else:
+                    # Put list on lines of 3
+                    output += f'  "{k}": [\n'
+                    for i in range(0, len(v), 3):
+                        output += "    " + ", ".join(f'"{x}"' for x in v[i : i + 3])
+                        output += ",\n"
+                    output += "  ],\n"
+                
+        return output
 
     def debug(self) -> None:
         """Print the current internal state of the form."""

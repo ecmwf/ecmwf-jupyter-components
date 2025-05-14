@@ -18,7 +18,7 @@ docs/make.bat
 docs/_static/.gitkeep
 docs/_templates/.gitkeep
 src/ecmwf/jupyter_components/__init__.py
-src/ecmwf/jupyter_components/jupyter_form.py
+src/ecmwf/jupyter_components/jupyter_forms.py
 src/ecmwf/jupyter_components/version.py
 src/ecmwf_jupyter_components.egg-info/PKG-INFO
 src/ecmwf_jupyter_components.egg-info/SOURCES.txt
