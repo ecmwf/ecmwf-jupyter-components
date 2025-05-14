@@ -76,8 +76,8 @@ class DssDownloadForm(DownloadForm):
         self,
         client: DssClient | None = None,
         output: Optional[widgets.Output] = None,
-        **client_kwargs
-    ):
+        **client_kwargs: Any,
+    ) -> None:
         if client is None:
             try:
                 client = DssClient(**client_kwargs)
