@@ -1,4 +1,3 @@
-
 # ecmwf-jupyter-components
 
 <p align="center">
@@ -16,7 +15,7 @@
   </a>
 </p>
 
-> \[!IMPORTANT\]
+> [!IMPORTANT]
 > This software is **Sandbox** and subject to ECMWF's guidelines on [Software Maturity](https://github.com/ecmwf/codex/raw/refs/heads/main/Project%20Maturity).
 
 ## Quick Start
