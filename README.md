@@ -18,6 +18,9 @@
 > [!IMPORTANT]
 > This software is **Sandbox** and subject to ECMWF's guidelines on [Software Maturity](https://github.com/ecmwf/codex/raw/refs/heads/main/Project%20Maturity).
 
+**ecmwf-jupyter-components** provides a range of tools for working with Meterology and climate data in Jupyter Environments.
+
+
 ## Quick Start
 
 ```python
