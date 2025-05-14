@@ -2,6 +2,7 @@ channels:
 - conda-forge
 - nodefaults
 dependencies:
+- cdsapi>=0.7.6
 - ecmwf-datastores-client
 - ipywidgets
 - make

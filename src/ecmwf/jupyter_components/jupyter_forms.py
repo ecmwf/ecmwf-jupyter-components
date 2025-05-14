@@ -1,12 +1,12 @@
+import abc
 import json
 from typing import Any, Callable, Dict, List, Optional
-import abc
 
+import cdsapi
 import ipywidgets as widgets
 from IPython.display import clear_output as _clear_output
 from IPython.display import display as _display
 
-import cdsapi
 from ecmwf.datastores import Client as DssClient
 
 
@@ -31,7 +31,7 @@ class AbstractDownloadForm(abc.ABC):
     def __init__(self) -> None:
         """Initialize the download form."""
         pass
-    
+
     @abc.abstractmethod
     def _build_form(self, collection_id: str) -> None:
         """Build the form for the specified collection ID.
@@ -40,12 +40,11 @@ class AbstractDownloadForm(abc.ABC):
         based on the collection's metadata.
         """
         pass
-    
+
     @abc.abstractmethod
     def debug(self) -> None:
         """Print the current internal state of the form."""
         pass
-
 
 
 class DownloadForm(AbstractDownloadForm):
@@ -57,7 +56,7 @@ class DownloadForm(AbstractDownloadForm):
 
     def __init__(self) -> None:
         raise NotImplementedError("This is an abstract base class.")
-    
+
     def _build_form(self, collection_id: str) -> None:
         """Build the form for the specified collection ID.
 
@@ -65,7 +64,7 @@ class DownloadForm(AbstractDownloadForm):
         based on the collection's metadata.
         """
         raise NotImplementedError("This method should be implemented by subclasses.")
-    
+
 
 class DssDownloadForm(DownloadForm):
     """Interactive selection form for collections in a Jupyter Notebook using ipywidgets.
@@ -91,7 +90,8 @@ class DssDownloadForm(DownloadForm):
                     )
         if isinstance(client, cdsapi.Client):
             client = client.client
-                    
+        assert client is not None, "client must be a DssClient instance"
+
         self.client: DssClient = client
         self.output: widgets.Output = output or widgets.Output()
         self.collection_id: Optional[str] = None
@@ -289,7 +289,6 @@ class DssDownloadForm(DownloadForm):
                 )
             )
 
-
     def _on_collection_change(self, change: Dict[str, Any]) -> None:
         if change["name"] == "value" and change["new"] != change["old"]:
             self._build_form(change["new"])
@@ -383,7 +382,7 @@ class DssDownloadForm(DownloadForm):
                         output += "    " + ", ".join(f'"{x}"' for x in v[i : i + 3])
                         output += ",\n"
                     output += "  ],\n"
-                
+
         return output
 
     def debug(self) -> None:

@@ -6,3 +6,4 @@ channels:
 dependencies:
 - ipywidgets
 - ecmwf-datastores-client
+- cdsapi>=0.7.6
