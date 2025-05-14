@@ -1,0 +1,13 @@
+LICENSE
+README.md
+pyproject.toml
+src/ecmwf/jupyter_components/__init__.py
+src/ecmwf/jupyter_components/jupyter_form.py
+src/ecmwf/jupyter_components/version.py
+src/ecmwf_jupyter_components.egg-info/PKG-INFO
+src/ecmwf_jupyter_components.egg-info/SOURCES.txt
+src/ecmwf_jupyter_components.egg-info/dependency_links.txt
+src/ecmwf_jupyter_components.egg-info/requires.txt
+src/ecmwf_jupyter_components.egg-info/top_level.txt
+tests/test_00_version.py
+tests/test_jupyter_form.py

@@ -1,0 +1,17 @@
+channels:
+- conda-forge
+- nodefaults
+dependencies:
+- ecmwf-datastores-client
+- ipywidgets
+- make
+- mypy
+- myst-parser
+- pip
+- pre-commit
+- pydata-sphinx-theme
+- pytest
+- pytest-cov
+- sphinx
+- sphinx-autoapi
+
