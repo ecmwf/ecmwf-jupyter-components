@@ -1,5 +1,6 @@
 import json
 from typing import Any, Callable, Dict, List, Optional
+import abc
 
 import ipywidgets as widgets
 from IPython.display import clear_output as _clear_output
@@ -17,7 +18,70 @@ def display(*args: Any, **kwargs: Any) -> None:
     return _display(*args, **kwargs)  # type: ignore
 
 
-class DownloadForm:
+# Abstract base class for download forms
+class AbstractDownloadForm(abc.ABC):
+    """Abstract base class for download forms.
+
+    This class provides a common interface for creating and managing download forms.
+    It is not intended to be used directly.
+    """
+
+    @abc.abstractmethod
+    def __init__(self) -> None:
+        """Initialize the download form."""
+        pass
+    
+    @abc.abstractmethod
+    def _build_form(self, collection_id: str) -> None:
+        """Build the form for the specified collection ID.
+
+        This method should be implemented by subclasses to create the form widgets
+        based on the collection's metadata.
+        """
+        pass
+    
+    @abc.abstractmethod
+    def debug(self) -> None:
+        """Print the current internal state of the form."""
+        pass
+
+
+
+class DownloadForm(AbstractDownloadForm):
+    """Abstract base class for download forms.
+
+    This class provides a common interface for creating and managing download forms.
+    It is not intended to be used directly.
+    """
+
+    def __init__(self) -> None:
+        raise NotImplementedError("This is an abstract base class.")
+    
+    def _build_form(self, collection_id: str) -> None:
+        """Build the form for the specified collection ID.
+
+        This method should be implemented by subclasses to create the form widgets
+        based on the collection's metadata.
+        """
+        raise NotImplementedError("This method should be implemented by subclasses.")
+    
+    # TODO: This may not need to be a class method
+    def _pretty_dict(self, request: dict[str, str | list[str]]) -> str:
+        """Return a pretty-printed JSON string of the request.
+
+        This method should be implemented by subclasses to format the request
+        in a human-readable way.
+        """
+        _request: dict[str, str | list[str]] = {}
+        for k, v in request.items():
+            if isinstance(v, list) and len(v) == 1:
+                _request[k] = v[0]
+            else:
+                _request[k] = v
+        return json.dumps(_request, indent=2)
+
+
+class DssDownloadForm(DownloadForm):
     """Interactive selection form for collections in a Jupyter Notebook using ipywidgets.
 
     Automatically builds form widgets from a collection's metadata and tracks user selections.
@@ -87,7 +151,7 @@ class DownloadForm:
             with self.selection_output:
                 self.selection_output.clear_output()
                 print(f"dataset = {self.collection_id}")
-                print(f"request = {self._pretty_request()}")
+                print(f"request = {self._pretty_dict(self.request)}")
 
         def on_change(change: Dict[str, Any]) -> None:
             for key, widget in self.widget_defs.items():
@@ -211,7 +275,7 @@ class DownloadForm:
             self.output.clear_output()
             with self.selection_output:
                 print(f"dataset = {self.collection_id}")
-                print(f"request = {self._pretty_request()}")
+                print(f"request = {self._pretty_dict(self.request)}")
             selection_box = widgets.Accordion(children=[self.selection_output])
             selection_box.set_title(0, "View current Selection")
             selection_box.selected_index = None
@@ -228,17 +292,6 @@ class DownloadForm:
                 )
             )
 
-    def _pretty_request(self, request: None | dict[str, str | list[str]] = None) -> str:
-        """Return a pretty-printed JSON string of the request."""
-        if request is None:
-            request = self.request
-        _request: dict[str, str | list[str]] = {}
-        for k, v in request.items():
-            if isinstance(v, list) and len(v) == 1:
-                _request[k] = v[0]
-            else:
-                _request[k] = v
-        return json.dumps(_request, indent=2)
 
     def _on_collection_change(self, change: Dict[str, Any]) -> None:
         if change["name"] == "value" and change["new"] != change["old"]:

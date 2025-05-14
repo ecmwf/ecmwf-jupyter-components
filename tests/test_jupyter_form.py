@@ -4,7 +4,7 @@ from unittest.mock import Mock
 import pytest
 from ipywidgets import Output, ToggleButton, VBox
 
-from ecmwf.jupyter_components.jupyter_form import DownloadForm
+from ecmwf.jupyter_components.jupyter_forms import DssDownloadForm
 
 
 @pytest.fixture
@@ -33,7 +33,7 @@ def mock_client() -> Mock:
 
 # @pytest.mark.skipif(not _IPYWIDGETS, reason="ipywidgets is not available")
 def test_form_initialization(mock_client: Mock) -> None:
-    form = DownloadForm(client=mock_client)
+    form = DssDownloadForm(client=mock_client)
     assert form.client == mock_client
     assert isinstance(form.output, Output)
     assert form.collection_widget.options == ("dataset1", "dataset2")
@@ -43,7 +43,7 @@ def test_form_initialization(mock_client: Mock) -> None:
 
 # @pytest.mark.skipif(not _IPYWIDGETS, reason="ipywidgets is not available")
 def test_collection_selection_triggers_build(mock_client: Mock) -> None:
-    form = DownloadForm(client=mock_client)
+    form = DssDownloadForm(client=mock_client)
     form.collection_widget.value = "dataset1"
     assert form.collection_id == "dataset1"
     assert "var" in form.widget_defs
@@ -53,7 +53,7 @@ def test_collection_selection_triggers_build(mock_client: Mock) -> None:
 
 # @pytest.mark.skipif(not _IPYWIDGETS, reason="ipywidgets is not available")
 def test_widget_creation_from_metadata(mock_client: Mock) -> None:
-    form = DownloadForm(client=mock_client)
+    form = DssDownloadForm(client=mock_client)
     form._build_form("dataset1")
 
     widget = form.widget_defs["var"]
@@ -83,7 +83,7 @@ def test_static_form_parser_filters() -> None:
             "details": {"labels": {"a": "A", "b": "B"}, "values": ["a", "b"]},
         },
     ]
-    dummy = DownloadForm()
+    dummy = DssDownloadForm()
     parsed = dummy._form_json_to_widgets_dict(form)
     assert "valid" in parsed
     assert parsed["valid"]["type"] == "radio"
