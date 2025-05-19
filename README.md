@@ -20,7 +20,6 @@
 
 **ecmwf-jupyter-components** provides a range of tools for working with Meterology and climate data in Jupyter Environments.
 
-
 ## Quick Start
 
 ```python

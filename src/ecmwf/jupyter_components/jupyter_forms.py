@@ -22,6 +22,7 @@ from IPython.display import clear_output as _clear_output
 from IPython.display import display as _display
 
 from ecmwf.datastores import Client as DssClient
+from ecmwf.datastores import Collections as DssCollections
 
 
 # Override IPython methods with typeset version
@@ -112,7 +113,6 @@ class DssDownloadForm(DownloadForm):
         self.collection_id: Optional[str] = None
         self.request: Dict[str, str | list[str]] = {}
 
-        self.collections: List[str] = sorted(client.get_collections().collection_ids)
         self.collection_widget: widgets.Dropdown = widgets.Dropdown(
             options=self.collections,
             description="Dataset",
@@ -120,7 +120,6 @@ class DssDownloadForm(DownloadForm):
         )
         self.widget_defs: Dict[str, widgets.Widget] = {}
         self.selection_output: widgets.Output = widgets.Output()
-        # self.selection_box: widgets.Output = widgets.Output()
 
         self.collection_widget.observe(self._on_collection_change, names="value")
 
@@ -128,6 +127,16 @@ class DssDownloadForm(DownloadForm):
 
         self._update_selection_state()
         display(self.output)
+
+    @property
+    def collections(self) -> List[str]:
+        """Return the list of available collection IDs."""
+        collection_ids: List[str] = []
+        collections: DssCollections | None = self.client.get_collections()
+        while collections is not None:
+            collection_ids += collections.collection_ids
+            collections = collections.next
+        return collection_ids
 
     def _display_initial_prompt(self) -> None:
         self.output.clear_output()
@@ -144,7 +153,6 @@ class DssDownloadForm(DownloadForm):
     def _build_form(self, collection_id: str) -> None:
         self.output.clear_output()
         self.selection_output.clear_output()
-        # self.selection_box.clear_output()
         self.widget_defs.clear()
         self.request = {}
 

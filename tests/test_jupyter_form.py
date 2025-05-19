@@ -24,7 +24,18 @@ from ecmwf.jupyter_components.jupyter_forms import DssDownloadForm
 @pytest.fixture
 def mock_client() -> Mock:
     mock = Mock()
-    mock.get_collections.return_value.collection_ids = ["dataset1", "dataset2"]
+
+    # Create two pages of collections
+    page2 = Mock()
+    page2.collection_ids = ["dataset2"]
+    page2.next = None
+
+    page1 = Mock()
+    page1.collection_ids = ["dataset1"]
+    page1.next = page2
+
+    mock.get_collections.return_value = page1
+
     mock.get_collection.return_value = Mock(
         form=[
             {
