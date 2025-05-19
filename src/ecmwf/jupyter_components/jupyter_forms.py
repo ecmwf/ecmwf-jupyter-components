@@ -157,7 +157,7 @@ class DssDownloadForm(DownloadForm):
     def collections(self) -> List[str]:
         """Return the list of available collection IDs."""
         collection_ids: List[str] = []
-        collections: DssCollections | None = self.client.get_collections()
+        collections: DssCollections | None = self.client.get_collections(sortby="id")
         while collections is not None:
             collection_ids += collections.collection_ids
             collections = collections.next
