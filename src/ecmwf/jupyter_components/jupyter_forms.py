@@ -117,16 +117,6 @@ class DssDownloadForm(DownloadForm):
         self.widget_defs: Dict[str, widgets.Widget] = {}
         self.selection_output: widgets.Output = widgets.Output()
 
-        # Spinner overlay
-        self.spinner_overlay = widgets.Box(
-            [widgets.HTML(
-                "<div style='position:absolute;top:40%;left:50%;transform:translate(-50%, -50%);"
-                "font-size:24px;'>⏳ Loading...</div>"
-            )],
-            layout=widgets.Layout(position="absolute", top="0", left="0", right="0", bottom="0",
-                                  justify_content="center", align_items="center",
-                                  background="rgba(255, 255, 255, 0.6)", z_index="10")
-        )
         self.main_box = widgets.Box([self.output], layout=widgets.Layout(position="relative"))
 
         self.collection_widget.observe(self._on_collection_change, names="value")
@@ -134,24 +124,6 @@ class DssDownloadForm(DownloadForm):
         self._display_initial_prompt()
         self._update_selection_state()
         display(self.main_box)
-
-    def _display_spinner(self) -> None:
-        self.main_box.children = [self.output, self.spinner_overlay]
-
-    def _hide_spinner(self) -> None:
-        self.main_box.children = [self.output]
-
-    def _display_initial_prompt(self) -> None:
-        self.output.clear_output()
-        with self.output:
-            display(
-                widgets.VBox(
-                    [
-                        widgets.HTML("<b>Select a dataset to begin</b>"),
-                        self.collection_widget,
-                    ]
-                )
-            )
 
     @property
     def collections(self) -> List[str]:
@@ -176,7 +148,6 @@ class DssDownloadForm(DownloadForm):
             )
 
     def _build_form(self, collection_id: str) -> None:
-        self._display_spinner()
         self.output.clear_output()
         self.selection_output.clear_output()
         self.widget_defs.clear()
@@ -239,7 +210,6 @@ class DssDownloadForm(DownloadForm):
                 )
                 for opt in options
             ]
-
             get_value: Callable[[], List[str]]
 
             if widget_type == "checkbox":
@@ -305,8 +275,6 @@ class DssDownloadForm(DownloadForm):
                 )
             )
 
-        self._hide_spinner()
-        
     def _on_collection_change(self, change: Dict[str, Any]) -> None:
         if change["name"] == "value" and change["new"] != change["old"]:
             self._build_form(change["new"])
