@@ -86,6 +86,7 @@ class DssDownloadForm(DownloadForm):
 
     Automatically builds form widgets from a collection's metadata and tracks user selections.
     """
+
     def __init__(
         self,
         client: DssClient | None = None,
@@ -99,7 +100,9 @@ class DssDownloadForm(DownloadForm):
                 try:
                     client = cdsapi.Client(**client_kwargs).client
                 except Exception:
-                    raise ValueError("No DSS client provided and no default client found.")
+                    raise ValueError(
+                        "No DSS client provided and no default client found."
+                    )
         if isinstance(client, cdsapi.Client):
             client = client.client
         assert client is not None, "client must be a DssClient instance"
@@ -117,7 +120,9 @@ class DssDownloadForm(DownloadForm):
         self.widget_defs: Dict[str, widgets.Widget] = {}
         self.selection_output: widgets.Output = widgets.Output()
 
-        self.main_box = widgets.Box([self.output], layout=widgets.Layout(position="relative"))
+        self.main_box = widgets.Box(
+            [self.output], layout=widgets.Layout(position="relative")
+        )
 
         self.collection_widget.observe(self._on_collection_change, names="value")
 
@@ -157,7 +162,9 @@ class DssDownloadForm(DownloadForm):
             display(widgets.HTML("Please wait while your download form is created..."))
 
         collection = self.client.get_collection(collection_id)
-        form_widgets: Dict[str, Dict[str, Any]] = self._form_json_to_widgets_dict(collection.form)
+        form_widgets: Dict[str, Dict[str, Any]] = self._form_json_to_widgets_dict(
+            collection.form
+        )
 
         def update_selection_display() -> None:
             with self.selection_output:
@@ -178,10 +185,14 @@ class DssDownloadForm(DownloadForm):
                 labels: Dict[str, str] = f_widget.get("labels", {})
                 if key in self.widget_defs:
                     widget = self.widget_defs[key]
-                    if hasattr(widget, "children") and isinstance(widget.children[1], widgets.GridBox):
+                    if hasattr(widget, "children") and isinstance(
+                        widget.children[1], widgets.GridBox
+                    ):
                         for tb in widget.children[1].children:
                             tb.layout.display = "none"
-                        for tb, opt in zip(widget.children[1].children, f_widget["values"]):
+                        for tb, opt in zip(
+                            widget.children[1].children, f_widget["values"]
+                        ):
                             if opt in values:
                                 tb.layout.display = ""
                     elif isinstance(widget, widgets.RadioButtons):
@@ -190,7 +201,9 @@ class DssDownloadForm(DownloadForm):
                             widget.value = None
                     elif isinstance(widget, widgets.SelectMultiple):
                         widget.options = values
-                        widget.value = tuple([x for x in self.request[key] if x in values])
+                        widget.value = tuple(
+                            [x for x in self.request[key] if x in values]
+                        )
 
             self._update_selection_state()
             update_selection_display()
@@ -213,14 +226,22 @@ class DssDownloadForm(DownloadForm):
             get_value: Callable[[], List[str]]
 
             if widget_type == "checkbox":
-                def get_value(tb_list=buttons, opts=options) -> List[str]:
+
+                def get_value(
+                    tb_list: List[widgets.ToggleButton] = buttons,
+                    opts: List[str] = options,
+                ) -> List[str]:
                     return [opt for opt, tb in zip(opts, tb_list) if tb.value]
+
                 for tb in buttons:
                     tb.observe(on_change, names="value")
             elif widget_type == "radio":
                 f_widget["title"] += " (select one)"
 
-                def on_radio_click(change: Dict[str, Any], tb_list=buttons) -> None:
+                def on_radio_click(
+                    change: Dict[str, Any],
+                    tb_list: List[widgets.ToggleButton] = buttons,
+                ) -> None:
                     if change["new"]:
                         for tb in tb_list:
                             if tb is not change["owner"]:
@@ -228,9 +249,15 @@ class DssDownloadForm(DownloadForm):
                         on_change(change)
 
                 for tb in buttons:
-                    tb.observe(lambda change, tb_list=buttons: on_radio_click(change, tb_list), names="value")
+                    tb.observe(
+                        lambda change, tb_list=buttons: on_radio_click(change, tb_list),
+                        names="value",
+                    )
 
-                def get_value(tb_list=buttons, opts=options) -> List[str]:
+                def get_value(
+                    tb_list: List[widgets.ToggleButton] = buttons,
+                    opts: List[str] = options,
+                ) -> List[str]:
                     for opt, tb in zip(opts, tb_list):
                         if tb.value:
                             return [opt]
@@ -238,13 +265,17 @@ class DssDownloadForm(DownloadForm):
             else:
                 raise ValueError(f"Unsupported widget type: {widget_type}")
 
-            widget = widgets.VBox([
-                widgets.HTML(f"<h3>{f_widget['title']}</h3>"),
-                widgets.GridBox(
-                    children=buttons,
-                    layout=widgets.Layout(grid_template_columns=f"repeat({columns}, auto)")
-                )
-            ])
+            widget = widgets.VBox(
+                [
+                    widgets.HTML(f"<h3>{f_widget['title']}</h3>"),
+                    widgets.GridBox(
+                        children=buttons,
+                        layout=widgets.Layout(
+                            grid_template_columns=f"repeat({columns}, auto)"
+                        ),
+                    ),
+                ]
+            )
 
             for tb, opt in zip(buttons, options):
                 tb.value = opt in f_widget.get("default", [])
